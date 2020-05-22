@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Chatbot Prototype Demo!</title>
+
+	<!-- this is for mobile screens -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="img/favicon.png">
+
+	<!-- this is for our css files - we have to link our html file to the css files -->
+	<link rel="stylesheet" media="all" href="../component/styles/setup.css">
+	<link rel="stylesheet" media="all" href="../component/styles/says.css">
+	<link rel="stylesheet" media="all" href="../component/styles/reply.css">
+	<link rel="stylesheet" media="all" href="../component/styles/typing.css">
+  <link rel="stylesheet" media="all" href="../component/styles/input.css">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,600,700&display=swap" rel="stylesheet">
+
+  <!-- css stylesheet for the background of the web page (no need to worry about this) -->
+	<style>
+	body {
+		background: #E6E6E6;
+	}
+	.bubble-container {
+		height: 100vh;
+	}
+	.bubble-container .input-wrap textarea {
+    margin: 0;
+	}
+	</style>
+</head>
+<body>
+
+<!-- header for the chatbot  -->
+<div id="chat">
+  <div class="header">
+    <img src="img/image.jpg" width="40px;">
+    <div>
+      <h1>TfL Report Chatbot</h1>
+      <p>A chatbot to make reporting sexual violence on the tube less rubbish</p>
+    </div>
+  </div>
+</div>
+
+<!-- This is to power the chatbot, you do not need to worry about this area -->
+<script src="../component/js/Bubbles.js"></script>
+<script>
+var chatWindow = new Bubbles(document.getElementById("chat"), "chatWindow", {
+  inputCallbackFn: function(o) {
+
+    // this is for the bot - don't worry
+    var match = function(key) {
+      setTimeout(function() {
+        chatWindow.talk(convo, key) // restart current convo from point found in the answer
+      }, 600)
+    }
+
+    // sanitize text for search function - for the bot
+    var strip = function(text) {
+      return text.toLowerCase().replace(/[\s.,\/#!$%\^&\*;:{}=\-_'"`~()]/g, "")
+    }
+
+    // search function -  for the bot
+    var found = false
+    o.convo[o.standingAnswer].reply.forEach(function(e, i) {
+      strip(e.human_response).includes(strip(o.input)) && o.input.length > 0
+        ? (found = e.bot_answer)
+        : found ? null : (found = false)
+    })
+    found ? match(found) : miss()
+  }
+}) // section for setting up bot is finished.
+
+
+// This is where your conversation is going to happen! Only focus here!
+var convo = {
+
+  //introduction
+  intro: {
+    bot_says: ["I'm a chatbot designed to help you if you see of experience violence whilst travelling."],
+    human_reply: [
+      {
+        human_response: "How can a chatbot do that?",
+        bot_answer: "explain",
+      },
+        {
+        human_response: "Can I report a past incident?",
+        bot_answer: "report-or-not",
+      },
+      {
+        human_response: "Somethings happening now",
+        bot_answer: "incident",
+      },
+      {
+        human_response: "Theres an emergency",
+        bot_answer: "emergency",
+      },
+    ]
+  },
+  
+  //explain-1
+
+      "explain": {
+    bot_says: ["Most public violence incidents have more than one witness, but the conviction rate is low. Often people feel uncomfortable or scared and so dont report it, and if they do their statements are taken after the fact. Human memory is really bad at the kinds of details needed for conviction."
+                     ,"Luckily, computers are very good at remembering things that humans find hard (like exact dates and locations)."],
+    human_reply: [
+      {
+        human_response: "Tell me more",
+        bot_answer: "more-info",
+      },
+       {
+        human_response: "Thanks, got it",
+        bot_answer: "find-me",
+      },
+    ]
+  },
+  
+//explain-2
+  
+      "find-me": {
+    bot_says: ["Okay, you know where to find me."],
+    
+  },
+  
+   "more-info": {
+    bot_says: ["LINK TO MORE INFO"],
+    
+  },
+    
+  //incident-1
+
+  
+  "incident": {
+    bot_says: ["Are you in immediate danger?"],
+    human_reply: [
+      
+       {
+        human_response: "No",
+        bot_answer: "report-or-not",
+      },
+      {
+        human_response: "Yes",
+        bot_answer: "emergency",
+      },
+      {
+        human_response: "No, but somebody else is",
+        bot_answer: "emergency",
+      },
+    ]
+  },
+   
+   //emergency
+    
+      "emergency": {
+    bot_says: ["For immediate help you can contact the British Transport Police:"],
+     human_reply: [
+      
+       {
+        human_response: "Im not sure if its an emergency",
+        bot_answer: "report-or-not",
+      },
+       {
+        human_response: "Call 0800 40 50 40",
+        bot_answer: "CALLING BTP",
+      },
+      {
+        human_response: "Text 61016",
+        bot_answer: "OPEN MESSENGER APP",
+      },
+      
+    ]
+  },
+  
+  //incident-2
+  
+   "report-or-not": {
+  bot_says: ["I can help you build a picture of the incident by making observations about your surroundings", "afterwards, you can decide whether to report it or not."],
+    human_reply: [
+      
+       {
+        human_response: "Why would this help?",
+        bot_answer: "why-it-helps",
+      }, 
+      {
+        human_response: "Lets do it",
+        bot_answer: "statement-builder",
+      },
+       
+    ]
+  },
+  
+  "why-it-helps": {
+  bot_says: ["A lot of people feel confused, scared or embarrased when sexual violence takes place, and taking note of whats happening makes it possible to record small but important details that could be forgotten later",
+             "These details can be useful if you decide to report it in the future, and paying close attention to your surroundings can often make you feel more in control in a stressful situation",
+            "The process is quick and just involves a few really simple questions. Afterwards, you can decide wether to report it or not."],
+    human_reply: [
+      
+       {
+        human_response: "Okay, what are the questions?",
+        bot_answer: "statement-builder",
+      },
+       {
+        human_response: "No thanks",
+        bot_answer: "find-me",
+      }, 
+    ]
+  },
+    
+  //statement builder
+   
+  "statement-builder": {
+  bot_says: ["Okay, can you briefly tell me about the incident?"],
+    human_reply: [
+      
+       {
+        human_response: "PERSON PUTS TEXT HERE",
+        bot_answer: "CCTV-help",
+      },
+    ]
+  },
+  
+  "CCTV-help": {
+  bot_says: ["That's very helpful, thank you.","On a transport network determining location can be difficult, but can be crucial if the police need to request specific CCTV footage.",
+             "These next questions will help us figure out exactly where the incident has taken place.","If you have a travel app open, we can scrape this data from there."],
+    human_reply: [
+      
+       {
+        human_response: "Okay",
+        bot_answer: "transport-mode",
+      },
+       {
+        human_response: "My travel app has the data",
+        bot_answer: "people-description",
+      },
+    ]
+  },
+  
+  "transport-mode": {
+  bot_says: ["Firstly, what mode of transport are you using?"],
+    human_reply: [
+      
+       {
+        human_response: "The Tube",
+        bot_answer: "tube-look",
+      },
+      {
+        human_response: "A Bus",
+        bot_answer: "bus-look",
+      },
+    ]
+  },
+    
+  //tube questions
+  
+  "tube-look": {
+  bot_says: ["Okay"," if you look around, you should notice a carriage number here:","INSERT IMAGE","It should be a string of 5 numbers"],
+    human_reply: [
+      
+       {
+        human_response: "ENTER CARRIAGE NUMBER",
+        bot_answer: "tube-position",
+      },
+      {
+        human_response: "I cant see it",
+        bot_answer: "tube-position",
+      },
+    ]
+  },
+  
+    "tube-position": {
+  bot_says: ["Okay, and roughly where are you in the carriage?"],
+    human_reply: [
+      
+       {
+        human_response: "Front",
+        bot_answer: "tube-options",
+      },
+      {
+        human_response: "Middle",
+        bot_answer: "tube-options",
+      },
+      {
+        human_response: "Back",
+        bot_answer: "tube-options",
+      },
+    ]
+  },
+  
+  "tube-options": {
+  bot_says: ["Thanks, that's really helpful."," Can you tell me, which line are you on?"],
+    human_reply: [
+      
+       {
+        human_response: "Central",
+        bot_answer: "select-on-station",
+      },
+      {
+        human_response: "Northern",
+        bot_answer: "select-on-station",
+      },
+      {
+        human_response: "DLR",
+        bot_answer: "Circle",
+      },
+      {
+        human_response: "Picadilly",
+        bot_answer: "select-on-station",
+      },
+    ]
+  },
+  
+  //bus questions
+  
+  "bus-look": {
+  bot_says: ["Okay"," if you look around, you should notice a carriage number here:","INSERT IMAGE","It should be a string of 5 numbers"],
+    human_reply: [
+      
+       {
+        human_response: "ENTER BUS NUMBER",
+        bot_answer: "bus-position",
+      },
+      {
+        human_response: "I cant see it",
+        bot_answer: "bus-position",
+      },
+    ]
+  },
+  
+    "bus-position": {
+  bot_says: ["Okay, and roughly where are you on the bus?"],
+    human_reply: [
+      
+       {
+        human_response: "Top-deck",
+        bot_answer: "bus-options",
+      },
+      {
+        human_response: "Bottom-deck",
+        bot_answer: "bus-options",
+      },
+    ]
+  },
+  
+   "bus-options": {
+  bot_says: ["Thanks, that's really helpful."," Can you tell me what bus route you are on?"],
+    human_reply: [
+      
+       {
+        human_response: "TYPE NUMBER",
+        bot_answer: "select-on-station",
+      },
+    ]
+  },
+  
+  //station questions
+  
+  "select-on-station": {
+  bot_says: ["Okay, where did you get on?"],
+    human_reply: [
+      
+       {
+        human_response: "PULL DOWN STATIONS",
+        bot_answer: "select-off-station",
+      },
+    ]
+  },
+  
+   "select-off-station": {
+  bot_says: ["And where did you get off?"],
+    human_reply: [
+      
+       {
+        human_response: "PULL DOWN STATIONS",
+        bot_answer: "station-now",
+      },
+    ]
+  },
+  
+  "station-now": {
+  bot_says: ["Thanks, can you remember the last stop you passed?"],
+    human_reply: [
+      
+       {
+        human_response: "PULL DOWN STATIONS",
+        bot_answer: "people-description",
+      },
+    ]
+  },
+  
+  //people description
+  
+   "people-description": {
+  bot_says: ["That information is really useful, well done.",
+             "These next questions will help build a picture of the people involved. This can help identify the perpertrators if you decide to report this.",
+             "Can you tell me about the people involved, in as much detail as possible?",
+             "If you have any footage of them, or its safe to take some, you can upload it here."],
+    human_reply: [
+      
+       {
+        human_response: "UPLOAD FOOTAGE",
+        bot_answer: "incident-position",
+      },
+      {
+        human_response: "WRITE DESCRIPTION",
+        bot_answer: "incident-position",
+      },
+    ]
+  },
+  
+  "incident-position": {
+  bot_says: ["Thank you so much, that can be the toughest section.",
+             "Now, can you describe where you are in relation to the other people involved?"],
+    human_reply: [
+      
+       {
+        human_response: "SHORT TEXT FIELD",
+        bot_answer: "end-statement",
+      },
+      {
+        human_response: "Im not sure",
+        bot_answer: "end-statement",
+      },
+    ]
+  },
+  
+  //next steps
+  
+  "end-statement": {
+  bot_says: ["Okay, thats it. Well done.",
+             "Now, would you like to forward this information to the British Transport Police?",
+             "If youre not sure yet then you can download this information and decide later."],
+    human_reply: [
+      
+       {
+        human_response: "Id like to report this",
+        bot_answer: "forward-BTP",
+      },
+      {
+        human_response: "Im not sure yet",
+        bot_answer: "wait-for-now",
+      },
+      {
+        human_response: "No thanks",
+        bot_answer: "wait-for-now",
+      },
+    ]
+  },
+  
+   "wait-for-now": {
+  bot_says: ["That's okay, not everybody wants to report things like this.",
+             " If you do need some more time to decide, please bare in mind that most CCTV footage is deleted after 72 hours.","After this window, it becomes much harder to proceed with this case."],
+    human_reply: [
+      
+       {
+        human_response: "DOWNLOAD STATEMENT",
+        bot_answer: "thanks",
+      },
+      {
+        human_response: "Id like to report this",
+        bot_answer: "forward-BTP",
+      },
+    ]
+  },
+  
+    "forward-BTP": {
+  bot_says: ["Great. You can just forward this statement to them here.",
+             "Please include your phone number incase they need to contact you regarding your case."],
+    human_reply: [
+      
+       {
+        human_response: "FORWARD STATEMENT",
+        bot_answer: "thanks",
+      },
+      {
+        human_response: "Actually Id like to wait",
+        bot_answer: "wait-for-now",
+      },
+    ]
+  },
+  
+    "thanks": {
+  bot_says: ["Thank you for reporting this incident.",
+             "Youre keeping everybody more safe by helping the police build a better picture of abuse in London."],
+  },
+  
+  //make sure you always keep this as this closes line 76!!!!!!
+}
+ //make sure you always keep this as this closes line 76!!!!!!
+
+//Do not worry about this!
+chatWindow.talk(convo)
+</script>
+</body>
